@@ -76,7 +76,6 @@ adminSchema.methods.generateRefreshToken= async function(){
     )
 }
 
-export {generateAccessToken, generateRefreshToken}
 export const admin= mongoose.model("admins", adminSchema);
 
 //Schema.plugin(mongooseAggregatePaginate)
