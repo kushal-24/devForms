@@ -1,4 +1,6 @@
 import mongoose, {Schema} from "mongoose";
+import jwt from "jsonwebtoken"
+import bcrypt from "bcrypt"
 
 const adminSchema= new Schema({
     fullName: {
@@ -76,6 +78,6 @@ adminSchema.methods.generateRefreshToken= async function(){
     )
 }
 
-export const admin= mongoose.model("admins", adminSchema);
+export const Admin= mongoose.model("admins", adminSchema);
 
 //Schema.plugin(mongooseAggregatePaginate)
