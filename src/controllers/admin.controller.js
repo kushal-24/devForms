@@ -6,6 +6,28 @@ import { apiResponse } from "../utils/apiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 
+
+const generateAccessAndRefreshToken= async(adminId)=>{
+    try {
+        const admin=await Admin.findById(adminId);
+        if (!admin) {
+            throw new apiError(404, "admin not found");
+        }
+    
+        const accessToken= admin.generateAccessToken();
+        const refreshToken= admin.generateRefreshToken();
+    
+        admin.refreshToken= refreshToken;
+        await admin.save({validateBeforeSave: false})
+    
+        return {accessToken, refreshToken}
+    } catch (error) {
+        throw new apiError(404,"generation of tokens failed :( ")
+    }
+}
+
+
+
 const adminReg = asyncHandler(async (req, res, next) => {
     const { fullName, email, username, password, age, dob } = req.body;
     //for extracting details in form data
@@ -56,4 +78,50 @@ const adminReg = asyncHandler(async (req, res, next) => {
         )
 })
 
-export { adminReg }
+
+////////////////////////////////LOGINNNNN/////
+const adminLogin= asyncHandler(async(req,res,next)=>{
+    const{username,email,password}=req.body;
+    if(!(username) && !(email)){
+        throw new apiError(400,"Fill in the details first")
+    }
+    const admin= await Admin.findOne({
+        $or:[{username}, {email}]
+    })
+
+    if(!admin){
+        throw new apiError(404,"No user registered found");
+    }
+
+    const isPasswordValid= await admin.isPasswordCorrect(password)
+
+    if(!isPasswordValid){
+        throw new apiError(400, "go away, wrong password, no more chances")
+    }
+
+    const {accessToken, refreshToken}= await generateAccessAndRefreshToken(admin._id)
+
+    const loggedInAdmin= await Admin.findById(admin._id).select("-password -refreshToken")
+
+    const options={
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+        new apiResponse(
+            200,
+            {
+                admin: loggedInAdmin,
+                accessToken, refreshToken
+            },
+            "LOGGED IN"
+        )
+    )
+})
+
+export { adminReg, adminLogin, generateAccessAndRefreshToken }
