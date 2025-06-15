@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import dotenv from "dotenv"
 
+
 const adminSchema= new Schema({
     fullName: {
         type: String,
@@ -57,8 +58,10 @@ adminSchema.methods.generateAccessToken= async function(){
             email: this.email,
             username: this.username,
             fullName: this.fullName,
+            dob: this.dob,
+            age: this.age,
         },
-        process.env.ACCESS_TOKEN_EXPIRY, 
+        process.env.ACCESS_TOKEN_SECRET, 
         {
             expiresIn: process.env.ACCESS_TOKEN_EXPIRY
         },
@@ -71,6 +74,8 @@ adminSchema.methods.generateRefreshToken= async function(){
             email: this.email,
             username: this.username,
             fullName: this.fullName,
+            dob: this.dob,
+            age: this.age,
         },
         process.env.REFRESH_TOKEN_SECRET, 
         {

@@ -7,6 +7,8 @@ import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 
 
+
+
 const generateAccessAndRefreshToken= async(adminId)=>{
     try {
         const admin=await Admin.findById(adminId);
@@ -124,4 +126,59 @@ const adminLogin= asyncHandler(async(req,res,next)=>{
     )
 })
 
-export { adminReg, adminLogin, generateAccessAndRefreshToken }
+
+//LOGOUTT///////////////////////////////////////
+
+const adminLogout= asyncHandler(async(req,res,next)=>{
+    await Admin.findByIdAndUpdate(
+        req.admin._id,
+        {
+            $unset: {
+                refreshToken:"",
+                
+            }
+        },
+        {
+            new: true//to return the new document
+        }
+    )
+    const options={
+        httpOnly: true,
+        secure: true,
+    }
+
+    return res
+    .status(200)
+    .clearCookie("accessToken",options)
+    .clearCookie("refreshToken",options)
+    .json(new apiResponse(200, {}, "logged out bro "))
+
+})
+
+
+
+
+
+
+
+
+
+
+
+
+//in ADMIN: 
+/**
+--> Admin register- admin controller
+-->Admin login- admin controller
+-->Admin logout- admin controller +authorisationadmin middleware
+-->Admin update details- admin controller + authorisationadmin middleware
+-->Admin change password- admin controller + authorisationadmin middleware
+-->Admin create an event- eventcreatecontroller + authorisationadmin middleware
+-->Edit/Delete Events- eventcreatecontroller + authorisationadmin middleware
+-->Admin reply to comments- querycontroller + authorisation middleware
+-->Admin to view registrations- regcontroller + authorisationadmin middleware
+-->export reg- regcontroller + authorisationadmin middleware
+-->
+ */
+
+export { adminReg, adminLogin, generateAccessAndRefreshToken, adminLogout}
