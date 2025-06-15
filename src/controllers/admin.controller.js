@@ -144,7 +144,7 @@ const adminLogout= asyncHandler(async(req,res,next)=>{
     )
     const options={
         httpOnly: true,
-        secure: true,
+        secure: false,
     }
 
     return res
