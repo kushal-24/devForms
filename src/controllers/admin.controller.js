@@ -8,23 +8,22 @@ import mongoose from "mongoose";
 
 
 
-
-const generateAccessAndRefreshToken= async(adminId)=>{
+const generateAccessAndRefreshToken = async (adminId) => {
     try {
-        const admin=await Admin.findById(adminId);
+        const admin = await Admin.findById(adminId);
         if (!admin) {
             throw new apiError(404, "admin not found");
         }
-    
-        const accessToken= await admin.generateAccessToken();
-        const refreshToken=await admin.generateRefreshToken();
-    
-        admin.refreshToken= refreshToken;
-        await admin.save({validateBeforeSave: false})
-    
-        return {accessToken, refreshToken}
+
+        const accessToken = await admin.generateAccessToken();
+        const refreshToken = await admin.generateRefreshToken();
+
+        admin.refreshToken = refreshToken;
+        await admin.save({ validateBeforeSave: false })
+
+        return { accessToken, refreshToken }
     } catch (error) {
-        throw new apiError(404,"generation of tokens failed :( ")
+        throw new apiError(404, "generation of tokens failed :( ")
     }
 }
 
@@ -82,90 +81,180 @@ const adminReg = asyncHandler(async (req, res, next) => {
 
 
 ////////////////////////////////LOGINNNNN/////
-const adminLogin= asyncHandler(async(req,res,next)=>{
-    const{username,email,password}=req.body;
-    if(!(username) && !(email)){
-        throw new apiError(400,"Fill in the details first")
+const adminLogin = asyncHandler(async (req, res, next) => {
+    const { username, email, password } = req.body;
+    if (!(username) && !(email)) {
+        throw new apiError(400, "Fill in the details first")
     }
-    const admin= await Admin.findOne({
-        $or:[{username}, {email}]
+    const admin = await Admin.findOne({
+        $or: [{ username }, { email }]
     })
 
-    if(!admin){
-        throw new apiError(404,"No user registered found");
+    if (!admin) {
+        throw new apiError(404, "No user registered found");
     }
 
-    const isPasswordValid= await admin.isPasswordCorrect(password)
+    const isPasswordValid = await admin.isPasswordCorrect(password)
 
-    if(!isPasswordValid){
+    if (!isPasswordValid) {
         throw new apiError(400, "go away, wrong password, no more chances")
     }
 
-    const {accessToken, refreshToken}= await generateAccessAndRefreshToken(admin._id)
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(admin._id)
 
-    const loggedInAdmin= await Admin.findById(admin._id).select("-password -refreshToken")
+    const loggedInAdmin = await Admin.findById(admin._id).select("-password -refreshToken")
 
-    const options={
+    const options = {
         httpOnly: true,
         secure: true
     }
 
     return res
-    .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
-    .json(
-        new apiResponse(
-            200,
-            {
-                admin: loggedInAdmin,
-                accessToken, refreshToken
-            },
-            "LOGGED IN"
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new apiResponse(
+                200,
+                {
+                    admin: loggedInAdmin,
+                    accessToken, refreshToken
+                },
+                "LOGGED IN"
+            )
         )
-    )
 })
 
 
-//LOGOUTT///////////////////////////////////////
 
-const adminLogout= asyncHandler(async(req,res,next)=>{
+//LOGOUTT///////////////////////////////////////
+const adminLogout = asyncHandler(async (req, res, next) => {
     await Admin.findByIdAndUpdate(
         req.admin._id,
         {
             $unset: {
-                refreshToken:"",
-                
+                refreshToken: "",
+
             }
         },
         {
             new: true//to return the new document
         }
     )
-    const options={
+    const options = {
         httpOnly: true,
         secure: false,
     }
 
     return res
-    .status(200)
-    .clearCookie("accessToken",options)
-    .clearCookie("refreshToken",options)
-    .json(new apiResponse(200, {}, "logged out bro "))
+        .status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(new apiResponse(200, {}, "logged out bro "))
 
 })
 
 
 
+const changeAdminPassword = asyncHandler(async (req, res, next) => {
+    /**
+     1. req for username or email and password, new password
+     2. if user wrong, error
+     3. if pasword wrong, error
+     4. new password =this.password
+     */
+
+    const { username, email, password, newPassword, confirmNewPassword } = req.body;
+    if(!(username)&&!(email)){
+        throw new apiError(400, "no email and username entered!");
+    }
+    
+    const admin = await Admin.findOne({
+        $or: [{ username }, { email }]
+    })
+    if(!admin){
+        throw new apiError(400, "no user found");
+    }
+
+    const isPasswordCorrect= await admin.isPasswordCorrect(password);
+    if(!isPasswordCorrect){
+        throw new apiError(401, "wrong password lil bro");
+    }
+
+    if(!(newPassword===confirmNewPassword)){
+        throw new apiError(400, "passwords dont match ");
+    }
+
+    admin.password= confirmNewPassword;
+    await admin.save({validateBeforeSave: false});
+
+    return res
+    .status(200)
+    .json(
+        new apiResponse(
+            200,
+            {},
+            "Password has been updated successfully yeahhyeahhh"
+        )
+    )
+
+})
+
+
+const getAdminDetails= asyncHandler(async(req,res,next)=>{
+    const adminId= req.admin?._id;
+    const admin= await Admin.findById(adminId).select("-password -refreshToken");
+    if(!admin){
+        throw new apiError(500, "server error hogaya");
+    }
+
+    return res
+    .status(200)
+    .json(
+        new apiResponse(
+            200,
+            admin,
+            "Admin details fetched successfully"
+        )
+    )
+})
 
 
 
+const updateAdminDetails= asyncHandler(async(req,res,next)=>{
+    const {username, email, dob, age}= req.body;
+    
+    const admin= await Admin.findOneAndUpdate({_id:req.admin?._id},
+        {
+            $set: {
+                username: username,
+                email: email,
+                dob: dob,
+                age: age,
+            }
+        },
+        {
+            new: true, 
+            runValidators: true, // ✅ validate schema on update
+        }
+    ).select("-password -refreshToken");
 
+    if(!admin){
+        throw new apiError(400, "No such admin exists");
+    }
 
+    return res
+    .status(200)
+    .json(
+        new apiResponse(
+            200,
+            admin,
+            "admin details are updated successfully"
+        )
+    )
+})
 
-
-
-
+export { adminReg, adminLogin, generateAccessAndRefreshToken, adminLogout, changeAdminPassword, getAdminDetails, updateAdminDetails }
 //in ADMIN: 
 /**
 --> Admin register- admin controller
@@ -180,5 +269,3 @@ const adminLogout= asyncHandler(async(req,res,next)=>{
 -->export reg- regcontroller + authorisationadmin middleware
 -->
  */
-
-export { adminReg, adminLogin, generateAccessAndRefreshToken, adminLogout}

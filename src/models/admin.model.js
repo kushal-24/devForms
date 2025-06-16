@@ -15,7 +15,7 @@ const adminSchema= new Schema({
     username: {
         type: String,
         required: true,
-        unique: true,
+        unique: [true,"This username is already taken"],
     },
     email: {
         type: String,

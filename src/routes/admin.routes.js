@@ -3,7 +3,10 @@ import {
     adminReg, 
     adminLogin, 
     generateAccessAndRefreshToken, 
-    adminLogout } 
+    adminLogout, 
+    changeAdminPassword,
+    getAdminDetails,
+    updateAdminDetails} 
     from "../controllers/admin.controller.js";
 import { Admin } from "../models/admin.model.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -22,5 +25,8 @@ router.route("/register").post(
     adminReg);
     router.route("/login").post(adminLogin);
     router.route("/logout").post(verifyJWT,adminLogout);
+    router.route("/changepassword").post(verifyJWT,changeAdminPassword);
+    router.route("/adminprofile").get(verifyJWT, getAdminDetails);
+    router.route("/updateaccount").patch(verifyJWT, updateAdminDetails);
 
 export default router;
