@@ -289,7 +289,50 @@ const changePfp= asyncHandler(async(req,res,next)=>{
     )
 })
 
-export { adminReg, adminLogin, generateAccessAndRefreshToken, adminLogout, changeAdminPassword, getAdminDetails, updateAdminDetails, changePfp }
+const refreshAccessToken = asyncHandler(async (req, res) => {
+    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
+
+    if (!incomingRefreshToken) {
+        throw new apiError(401, "Unauthorised request brother");//token hi sahi nai hai 
+    }
+
+    try {
+        const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+        const admin = await Admin.findById(decodedToken?._id);
+
+        if (!admin) {
+            throw new apiError(401, "no user found or some changes made");//user hi nai hai 
+        }
+
+        if (incomingRefreshToken !== admin?.refreshToken) {
+            throw new apiError(401, "no user found or some changes made");//user hi nai hai 
+        }
+
+        const options = {
+            httpOnly: true,
+            secure: true
+        }
+
+        const { accessToken, newrefreshToken } = generateAccessAndRefreshToken(admin._id);
+
+        return res
+            .status(200)
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", newrefreshToken, options)
+            .json(
+                new apiResponse(
+                    200,
+                    { accessToken, newrefreshToken },
+                    "Access token is refreshed"
+                )
+            )
+    } catch (error) {
+        throw new apiError(400, error?.message || "invalid refresh token")
+    }
+})
+
+export { adminReg, adminLogin, generateAccessAndRefreshToken, adminLogout, changeAdminPassword, getAdminDetails, updateAdminDetails, changePfp,refreshAccessToken }
 //in ADMIN: 
 /**
 --> Admin register- admin controller  ✅
