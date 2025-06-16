@@ -2,6 +2,9 @@ import mongoose, {Schema} from "mongoose";
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import dotenv from "dotenv"
+dotenv.config({
+    path: './env'
+})
 
 
 const adminSchema= new Schema({
@@ -63,7 +66,7 @@ adminSchema.methods.generateAccessToken= async function(){
         },
         process.env.ACCESS_TOKEN_SECRET, 
         {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
         },
     )
 }

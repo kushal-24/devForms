@@ -16,8 +16,8 @@ const generateAccessAndRefreshToken= async(adminId)=>{
             throw new apiError(404, "admin not found");
         }
     
-        const accessToken= admin.generateAccessToken();
-        const refreshToken= admin.generateRefreshToken();
+        const accessToken= await admin.generateAccessToken();
+        const refreshToken=await admin.generateRefreshToken();
     
         admin.refreshToken= refreshToken;
         await admin.save({validateBeforeSave: false})
