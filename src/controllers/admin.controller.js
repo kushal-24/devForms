@@ -254,14 +254,49 @@ const updateAdminDetails= asyncHandler(async(req,res,next)=>{
     )
 })
 
-export { adminReg, adminLogin, generateAccessAndRefreshToken, adminLogout, changeAdminPassword, getAdminDetails, updateAdminDetails }
+
+
+const changePfp= asyncHandler(async(req,res,next)=>{
+    const pfpLocalPath= req.file?.path
+    if(!pfpLocalPath){
+        throw new apiError(400,"no pfp acquired")
+    }
+    const pfp= await uploadOnCloudinary(pfpLocalPath);
+    if(!pfp){
+        throw new apiError(400,"sorry, couldnt upload it bro :(")
+    }
+
+    const admin= await Admin.findByIdAndUpdate({_id: req.admin?._id},
+        {
+            $set: {
+                pfp: pfp.url
+            }
+        },
+        {
+            new: true,
+            runValidators: false,
+        }
+    )
+
+    return res
+    .status(200)
+    .json(
+        new apiResponse(
+            200,
+            admin,
+            "pfp updates successfullyy"
+        )
+    )
+})
+
+export { adminReg, adminLogin, generateAccessAndRefreshToken, adminLogout, changeAdminPassword, getAdminDetails, updateAdminDetails, changePfp }
 //in ADMIN: 
 /**
---> Admin register- admin controller
--->Admin login- admin controller
--->Admin logout- admin controller +authorisationadmin middleware
--->Admin update details- admin controller + authorisationadmin middleware
--->Admin change password- admin controller + authorisationadmin middleware
+--> Admin register- admin controller  ✅
+-->Admin login- admin controller  ✅
+-->Admin logout- admin controller +authorisationadmin middleware  ✅
+-->Admin update details- admin controller + authorisationadmin middleware  ✅
+-->Admin change password- admin controller + authorisationadmin middleware  ✅
 -->Admin create an event- eventcreatecontroller + authorisationadmin middleware
 -->Edit/Delete Events- eventcreatecontroller + authorisationadmin middleware
 -->Admin reply to comments- querycontroller + authorisation middleware

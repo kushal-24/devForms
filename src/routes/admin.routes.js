@@ -6,7 +6,8 @@ import {
     adminLogout, 
     changeAdminPassword,
     getAdminDetails,
-    updateAdminDetails} 
+    updateAdminDetails,
+    changePfp} 
     from "../controllers/admin.controller.js";
 import { Admin } from "../models/admin.model.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -28,5 +29,6 @@ router.route("/register").post(
     router.route("/changepassword").post(verifyJWT,changeAdminPassword);
     router.route("/adminprofile").get(verifyJWT, getAdminDetails);
     router.route("/updateaccount").patch(verifyJWT, updateAdminDetails);
+    router.route("/updatepfp").patch(verifyJWT,upload.single("pfp"),changePfp);
 
 export default router;
