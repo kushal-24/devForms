@@ -1,6 +1,10 @@
 import mongoose, { Schema } from "mongoose";
 
 const userSchema = new Schema({
+    eventId: {
+        type: Schema.Types.ObjectId,
+        ref: "EventRegister"
+    },
     fullName: {
         type: String,
         required: true

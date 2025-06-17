@@ -17,8 +17,10 @@ app.use(cookieParser());
 
 //route import
 import adminRouter from "./routes/admin.routes.js"
+import eventRouter from "./routes/event.routes.js"
 
 //route declare
 app.use('/api/v1/admin', adminRouter); 
+app.use('/api/v1/event', eventRouter); 
 
 export {app}

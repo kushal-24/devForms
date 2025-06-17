@@ -18,30 +18,31 @@ const eventRegisterSchema = new Schema({
         type: String,
         required: true
     },
-    pic: {
+    logo: {
         type: String,
         required: true
     },
     themeTags: {
         type: [String], // array of tags like ["AI", "Blockchain"]
-        required: true
+        required: true,
+        default:[],
     },
     registrationsStart: {
-        type: Date,
+        type: String,
         required: true
     },
     registrationsDeadline: {
-        type: Date,
+        type: String,
         required: true
     },
 
     eventStarts: {
-        type: Date,
+        type: String,
         required: true
     },
 
     eventEnds: {
-        type: Date,
+        type: String,
         required: true
     },
     aboutEvent: {
@@ -56,9 +57,9 @@ const eventRegisterSchema = new Schema({
         type: String, // or Number if you want to store as a fixed amount
         required: true
     },
-    sponsorsImg: {
+    sponsImg: {
         type: [String], // array of sponsor image URLs
-        default: [""]
+        default: []
     },
     teamSize: {
         type: Number,
@@ -68,11 +69,10 @@ const eventRegisterSchema = new Schema({
         type: String, // email or phone or both
         required: true
     },
-    registeredPeople: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-    }
-    
+    pfpOC: {
+        type: [String],
+        default: [],
+    },
 }, { timestamps: true });
 
 export const EventRegister = mongoose.model("eventRegisters", eventRegisterSchema)
