@@ -10,6 +10,7 @@ import {
     changePfp,
     refreshAccessToken} 
     from "../controllers/admin.controller.js";
+import { registrationsStatus } from "../controllers/regToggle.controller.js";
 import { Admin } from "../models/admin.model.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -31,7 +32,8 @@ router.route("/register").post(
     router.route("/adminprofile").get(verifyJWT, getAdminDetails);
     router.route("/updateaccount").patch(verifyJWT, updateAdminDetails);
     router.route("/updatepfp").patch(verifyJWT,upload.single("pfp"),changePfp);
-    router.route("/refreshtoken").post(refreshAccessToken)
+    router.route("/refreshtoken").post(refreshAccessToken);
+    router.route("/regtoggle").post(verifyJWT, registrationsStatus);
 
 
 export default router;

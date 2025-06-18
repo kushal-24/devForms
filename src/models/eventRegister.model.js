@@ -6,8 +6,8 @@ const eventRegisterSchema = new Schema({
         required: true
     },
     organisedBy: {
-        type: String,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Admin"
     },
     mode: {
         type: String,
@@ -72,6 +72,10 @@ const eventRegisterSchema = new Schema({
     pfpOC: {
         type: [String],
         default: [],
+    },
+    isRegOpen: {
+        type: Boolean,
+        default: true,
     },
 }, { timestamps: true });
 
