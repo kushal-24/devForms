@@ -63,7 +63,8 @@ const adminReg = asyncHandler(async (req, res, next) => {
         password,
         pfp: pfp.url,
         age,
-        dob
+        dob,
+        role: "admin",
     })
 
     const createdAdmin = await Admin.findById(admin._id).select("-password -refreshToken")

@@ -27,13 +27,13 @@ router.route("/register").post(
     ]),
     adminReg);
     router.route("/login").post(adminLogin);
-    router.route("/logout").post(verifyJWT,adminLogout);
-    router.route("/changepassword").post(verifyJWT,changeAdminPassword);
-    router.route("/adminprofile").get(verifyJWT, getAdminDetails);
-    router.route("/updateaccount").patch(verifyJWT, updateAdminDetails);
-    router.route("/updatepfp").patch(verifyJWT,upload.single("pfp"),changePfp);
+    router.route("/logout").post(verifyJWT(["admin"]),adminLogout);
+    router.route("/changepassword").post(verifyJWT(["admin"]),changeAdminPassword);
+    router.route("/adminprofile").get(verifyJWT(["admin"]), getAdminDetails);
+    router.route("/updateaccount").patch(verifyJWT(["admin"]), updateAdminDetails);
+    router.route("/updatepfp").patch(verifyJWT(["admin"]),upload.single("pfp"),changePfp);
     router.route("/refreshtoken").post(refreshAccessToken);
-    router.route("/regtoggle").post(verifyJWT, registrationsStatus);
+    router.route("/regtoggle").post(verifyJWT(["admin"]), registrationsStatus);
 
 
 export default router;

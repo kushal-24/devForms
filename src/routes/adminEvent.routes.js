@@ -42,7 +42,7 @@ router.route("/createevent").post(
             name: "logo",
             maxCount: 1,
         }
-    ]), verifyJWT, createNewEvent)
+    ]), verifyJWT(["admin"]), createNewEvent)
 router.route("/updatecoverimg/:eventTitle").patch(
     upload.fields([
         {
@@ -50,36 +50,36 @@ router.route("/updatecoverimg/:eventTitle").patch(
             maxCount: 1,
         }
     ])
-    , verifyJWT, updateCoverImg)
+    , verifyJWT(["admin"]), updateCoverImg)
 router.route("/updatepfpoc/:eventTitle").patch(
     upload.fields([
         {
             name: "pfpOC",
             maxCount: 3,
         }
-    ]), verifyJWT, updatePfpOC)
+    ]), verifyJWT(["admin"]), updatePfpOC)
 router.route("/updatelogo/:eventTitle").patch(
     upload.fields([
         {
             name: "logo",
             maxCount: 1,
         }
-    ]), verifyJWT, updateLogo)
+    ]), verifyJWT(["admin"]), updateLogo)
 router.route("/updatesponsimg/:eventTitle").patch(
     upload.fields([
         {
             name: "sponsImg",
             maxCount: 5,
         }
-    ]), verifyJWT, updateSponsImg)
-router.route("/deleteevent/:eventTitle").delete(verifyJWT, deleteEvent)
-router.route("/geteventdetails/:eventTitle").get(verifyJWT, getEventDetails)
-router.route("/editeventdetails/:eventname").patch(verifyJWT, editEventDetails)
-router.route("/getallevents").get(verifyJWT, getAllEvents)
-router.route("/deletesponsimg/:eventTitle").delete(verifyJWT, deleteSponsImg)
-router.route("/deletelogo/:eventTitle").delete(verifyJWT, deleteLogo)
-router.route("/deletecoverimg/:eventTitle").delete(verifyJWT, deleteCoverImg)
-router.route("/deletepfpoc/:eventTitle").delete(verifyJWT, deletePfpOC)
+    ]), verifyJWT(["admin"]), updateSponsImg)
+router.route("/deleteevent/:eventTitle").delete(verifyJWT(["admin"]), deleteEvent)
+router.route("/geteventdetails/:eventTitle").get(verifyJWT(["admin"]), getEventDetails)
+router.route("/editeventdetails/:eventname").patch(verifyJWT(["admin"]), editEventDetails)
+router.route("/getallevents").get(verifyJWT(["admin"]), getAllEvents)
+router.route("/deletesponsimg/:eventTitle").delete(verifyJWT(["admin"]), deleteSponsImg)
+router.route("/deletelogo/:eventTitle").delete(verifyJWT(["admin"]), deleteLogo)
+router.route("/deletecoverimg/:eventTitle").delete(verifyJWT(["admin"]), deleteCoverImg)
+router.route("/deletepfpoc/:eventTitle").delete(verifyJWT(["admin"]), deletePfpOC)
 
 
 

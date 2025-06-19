@@ -8,6 +8,12 @@ dotenv.config({
 
 
 const adminSchema= new Schema({
+    role: {
+        type: String,
+        enum: ["admin"],
+        default: "admin",
+        immutable: true,
+    },
     fullName: {
         type: String,
         required: true,
@@ -63,6 +69,7 @@ adminSchema.methods.generateAccessToken= async function(){
             fullName: this.fullName,
             dob: this.dob,
             age: this.age,
+            role: this.role,
         },
         process.env.ACCESS_TOKEN_SECRET, 
         {
@@ -79,6 +86,7 @@ adminSchema.methods.generateRefreshToken= async function(){
             fullName: this.fullName,
             dob: this.dob,
             age: this.age,
+            role: this.role,
         },
         process.env.REFRESH_TOKEN_SECRET, 
         {
