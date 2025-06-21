@@ -4,8 +4,6 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Admin } from "../models/admin.model.js"
 import { apiResponse } from "../utils/apiResponse.js";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
-
 
 
 const generateAccessAndRefreshToken = async (adminId) => {
@@ -333,7 +331,16 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     }
 })
 
-export { adminReg, adminLogin, generateAccessAndRefreshToken, adminLogout, changeAdminPassword, getAdminDetails, updateAdminDetails, changePfp,refreshAccessToken }
+export { 
+    adminReg, 
+    adminLogin, 
+    generateAccessAndRefreshToken, 
+    adminLogout, 
+    changeAdminPassword, 
+    getAdminDetails, 
+    updateAdminDetails, 
+    changePfp,
+    refreshAccessToken }
 //in ADMIN: 
 /**
 --> Admin register- admin controller  ✅

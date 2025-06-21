@@ -18,28 +18,19 @@ export const verifyJWT = (allowedRoles = []) => asyncHandler(async (req, _, next
         throw new apiError(401, "Unauthorized request: No token");
     }
 
-    try {
-        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    } catch (err) {
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    if(!decodedToken) {
         throw new apiError(401, "Token is invalid or expired");
     }
 
+    let account;
     // Identify source model based on role in the token
     if (decodedToken.role === "admin") {
-        const admin = await Admin.findById(decodedToken._id).select("-password -refreshToken");
-        req.admin = admin;
-
-        if (!admin) {
-            throw new apiError(401, "Invalid Access Token: User/Admin not found");
-        }
-
+         account = await Admin.findById(decodedToken._id).select("-password -refreshToken");
+        req.admin = account;
     } else if (decodedToken.role === "user") {
-        const user = await User.findById(decodedToken._id).select("-password -refreshToken");
-        req.user = user;
-
-        if (!user) {
-            throw new apiError(401, "Invalid Access Token: User/Admin not found");
-        }
+         account = await User.findById(decodedToken._id).select("-password -refreshToken");
+        req.user = account;
     }
 
     // Optional role-based access control

@@ -14,10 +14,6 @@ const fillFormSchema = new Schema({
         required: true,
         unique: true
     },
-    password:{
-        type: String,
-        required: true,
-    },
     mobileNo: {
         type: String,
         required: true

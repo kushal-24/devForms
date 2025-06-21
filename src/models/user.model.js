@@ -13,7 +13,6 @@ const userSchema = new Schema({
         default: "user",
         immutable: true,
     },
-
     fullName: {
         type: String,
         required: true,
@@ -28,30 +27,33 @@ const userSchema = new Schema({
         required: true,
     },
     mobileNo: {
-        type: String,
-        required: true
+        type: Number,
+        required: true,
+        unique: true,
     },
+    refreshToken: {
+        type: String,
+    }
 }, { timestamps: true });
 
-userSchema.
-    //MIDDLEWARE
-    userSchema.pre("save", async function (next) {
-        if (this.isModified("password")) return next();
-        this.password = await bcrypt.hash(this.password, 10);
-        next();
-    })
+//MIDDLEWARE
+userSchema.pre("save", async function (next) {
+    if (!this.isModified("password")) return next();
+    this.password = await bcrypt.hash(this.password, 10);
+    next();
+})
 
 userSchema.methods.isPasswordCorrect = async function (password) {
-    return await bcrypt.compare(this.password, password);
+    return await bcrypt.compare(password, this.password);
 }
 
 userSchema.methods.generateAccessToken = async function () {
     return jwt.sign(
         {
             _id: this._id,
-            fullName,
-            email,
-            mobileNo,
+            fullName: this.fullName,
+            email: this.email,
+            mobileNo: this.mobileNo,
             role: this.role,
         },
         process.env.ACCESS_TOKEN_SECRET,
@@ -65,9 +67,9 @@ userSchema.methods.generateRefreshToken = async function () {
     return jwt.sign(
         {
             _id: this._id,
-            fullName,
-            email,
-            mobileNo,
+            fullName: this.fullName,
+            email: this.email,
+            mobileNo: this.mobileNo,
             role: this.role,
         },
         process.env.REFRESH_TOKEN_SECRET,
