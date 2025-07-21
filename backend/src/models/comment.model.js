@@ -1,12 +1,12 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
-const commentSchema= new Schema({
-    hackathonName: {
+const commentSchema = new Schema({
+    eventId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "eventRegister"
     },
-    commentData: {
+    commentText: {
         type: String,
         required: true,
     },
@@ -15,11 +15,16 @@ const commentSchema= new Schema({
         ref: "user",
         default: null,
     },
-    aadminId: {
+    adminId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "admin",
         default: null,
     },
-},{timestamps: true})
+    parentCommentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "comments",
+        default: null // null for top-level comments
+    }
+}, { timestamps: true })
 
-export const Comment= mongoose.model("comments", commentSchema)
+export const Comment = mongoose.model("comments", commentSchema)

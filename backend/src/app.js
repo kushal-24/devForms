@@ -19,10 +19,12 @@ app.use(cookieParser());
 import adminRouter from "./routes/admin.routes.js"
 import eventRouter from "./routes/adminEvent.routes.js"
 import userRouter from "./routes/user.routes.js"
+import commentRouter from "./routes/comments.route.js"
 
 //route declare
 app.use('/api/v1/admin', adminRouter); 
 app.use('/api/v1/event', eventRouter); 
 app.use('/api/v1/user', userRouter); 
+app.use('/api/v1/comment', commentRouter); 
 
 export {app}
